@@ -87,7 +87,6 @@ using Token = std::variant<OpeningBracket, ClosingBracket, Number, UnknownToken,
                            MinToken, MaxToken, SqrToken, AbsToken, Plus, Minus,
                            Multiply, Modulo, Divide>;
 
-                           
 std::ostream& operator<<(std::ostream& os, const Token& token) {
   std::visit([&os](const auto& t) { os << t; }, token);
   return os;
@@ -122,7 +121,7 @@ Token ParseName(const std::string& input, size_t& pos) {
   std::string name;
   auto symbol = static_cast<unsigned char>(input[pos]);
   while (std::isalpha(symbol)) {
-    name += symbol;
+    name.push_back(symbol);
     if (pos == input.size()) {
       break;
     }
@@ -148,7 +147,7 @@ std::vector<Token> Tokenize(const std::string& input) {
                it != kSymbol2Token.end()) {
       tokens.emplace_back(it->second);
       ++pos;
-    } else if (std::isalpha(symbol)) {
+    } else {
       tokens.emplace_back(ParseName(input, pos));
     }
   }
