@@ -29,6 +29,9 @@ class SinglyLinkedList {
 
   template <size_t N>
   void insertArray(const T (&array)[N]) {
+    if (N == 0 || array == nullptr) {
+      return;
+    }
     for (size_t i = 0; i < N; i++) {
       insertLast(array[i]);
     }
