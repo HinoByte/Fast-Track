@@ -12,10 +12,12 @@ int buffer_write_count = 0;
 
 int main() {
   int server_socket, new_socket;
-  struct sockaddr_in address = {.sin_family = AF_INET,
-                                .sin_addr.s_addr = INADDR_ANY,
-                                .sin_port = htons(9999)};
+  struct sockaddr_in address;
   int addr_len = sizeof(address);
+
+  address.sin_family = AF_INET;
+  address.sin_addr.s_addr = INADDR_ANY;
+  address.sin_port = htons(9999);
 
   std::vector<unsigned char> circular_buffer(CIRCULAR_BUFFER_SIZE);
   int head = 0, tail = 0;
@@ -52,7 +54,7 @@ int main() {
       if (bytes_read <= 0) {
         break;
       }
-      if (bytes_read == 0) { //в буфере пусто, сбрасываем состояние
+      if (bytes_read == 0) {  // в буфере пусто, сбрасываем состояние
         tail = head;
         buffer_write_count = 0;
       } else {
