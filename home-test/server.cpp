@@ -8,6 +8,7 @@
 
 const int BUFFER_SIZE = 1024;
 const int CIRCULAR_BUFFER_SIZE = 8192;
+int buffer_write_count = 0;
 
 int main() {
   int server_socket, new_socket;
@@ -51,15 +52,23 @@ int main() {
       if (bytes_read <= 0) {
         break;
       }
-      for (int i = 0; i < bytes_read; i++) {
-        circular_buffer[tail] = buffer[i];
-        tail =
-            (tail + 1) % CIRCULAR_BUFFER_SIZE;  // это нужно для того, что если
-                                                // пришло сообщение больше
-        // циклического буфера
-        if (tail == (head + CIRCULAR_BUFFER_SIZE - 1) % CIRCULAR_BUFFER_SIZE) {
-          std::cerr << "Переполнение циклического буфера" << std::endl;
-          break;
+      if (bytes_read == 0) { //в буфере пусто, сбрасываем состояние
+        tail = head;
+        buffer_write_count = 0;
+      } else {
+        for (int i = 0; i < bytes_read; i++) {
+          circular_buffer[tail] = buffer[i];
+          tail = (tail + 1) %
+                 CIRCULAR_BUFFER_SIZE;  // это нужно для того, что если
+                                        // пришло сообщение больше
+          buffer_write_count++;  // **Увеличить счетчик**
+          // Проверка переполнения циклического буфера
+          if (tail == (head + buffer_write_count) % CIRCULAR_BUFFER_SIZE) {
+            tail = head;
+            buffer_write_count = 0;
+            std::cerr << "Переполнение циклического буфера" << std::endl;
+            break;
+          }
         }
       }
       std::string ack = "Сообщение получено\n";
