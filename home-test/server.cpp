@@ -19,7 +19,7 @@ int main() {
   std::vector<unsigned char> circular_buffer(CIRCULAR_BUFFER_SIZE);
   int head = 0, tail = 0;
 
-  server_socket = socket(AF_INET, SOCK_STREAM, 0); //потоковый
+  server_socket = socket(AF_INET, SOCK_STREAM, 0);  // потоковый
   if (server_socket == 0) {
     std::cerr << "Ошибка создания сокета" << std::endl;
     return -1;
@@ -35,7 +35,7 @@ int main() {
     return -1;
   }
 
-  while (true) { //общий цикл сервера, который постоянно слушает соединения
+  while (true) {  // общий цикл сервера, который постоянно слушает соединения
     std::cout << "Ожидание входящих подключений" << std::endl;
     new_socket = accept(server_socket, (struct sockaddr *)&address,
                         (socklen_t *)&addr_len);
@@ -45,16 +45,19 @@ int main() {
     }
 
     char buffer[BUFFER_SIZE];
-    while (true) { //цикл внутри общего цикла, который считывает фрагменты по 1024 байт
+    while (true) {  // цикл внутри общего цикла, который считывает фрагменты по
+                    // 1024 байт
       int bytes_read = read(new_socket, buffer, BUFFER_SIZE);
       if (bytes_read <= 0) {
         break;
       }
       for (int i = 0; i < bytes_read; i++) {
         circular_buffer[tail] = buffer[i];
-        tail = (tail + 1) % CIRCULAR_BUFFER_SIZE; //это нужно для того, что если пришло сообщение больше
-        //циклического буфера
-        if (tail == head) {
+        tail =
+            (tail + 1) % CIRCULAR_BUFFER_SIZE;  // это нужно для того, что если
+                                                // пришло сообщение больше
+        // циклического буфера
+        if (tail == (head + CIRCULAR_BUFFER_SIZE - 1) % CIRCULAR_BUFFER_SIZE) {
           std::cerr << "Переполнение циклического буфера" << std::endl;
           break;
         }
